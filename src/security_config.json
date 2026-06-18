@@ -1,0 +1,40 @@
+{
+  "security_settings": [
+    {
+      "parameter": "trusted_ip_addresses",
+      "description": "List of static IP addresses trusted by the system",
+      "values": [
+        "192.168.1.1",
+        "192.168.1.2",
+        "192.168.1.10",
+        "10.0.0.1",
+        "10.0.0.2"
+      ]
+    },
+    {
+      "parameter": "mock_system_thresholds",
+      "description": "Threshold limits used for mock and test security checks",
+      "values": {
+        "max_failed_login_attempts": 5,
+        "session_timeout_minutes": 30,
+        "request_rate_limit_per_minute": 100,
+        "alert_trigger_score": 75
+      }
+    },
+    {
+      "parameter": "incident_severity_levels",
+      "description": "Severity classifications and their numeric score ranges",
+      "values": {
+        "LOW": { "min": 0, "max": 39 },
+        "MEDIUM": { "min": 40, "max": 69 },
+        "HIGH": { "min": 70, "max": 89 },
+        "CRITICAL": { "min": 90, "max": 100 }
+      }
+    },
+    {
+      "parameter": "allowed_ports",
+      "description": "Network ports considered safe for inbound traffic",
+      "values": [80, 443, 22, 8080]
+    }
+  ]
+}
