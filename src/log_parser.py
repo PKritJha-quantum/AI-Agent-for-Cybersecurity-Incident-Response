@@ -1,9 +1,10 @@
 import csv
 import re
+import os
 from datetime import datetime
 
-INPUT_FILE = "raw_logs.txt"
-OUTPUT_FILE = "cleaned_logs.csv"
+INPUT_FILE = "../data/raw_logs.txt" 
+OUTPUT_FILE = "../data/cleaned_logs.csv"
 
 CSV_HEADERS = ["timestamp", "ip_address", "event_type", "severity", "status"]
 
