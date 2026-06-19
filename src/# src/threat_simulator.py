@@ -79,41 +79,24 @@ def generate_valid_log():
 
 # Invalid Logs
 
-
 def generate_invalid_log():
-
-    noise_type = random.randint(1, 4)
-
+    noise_type = random.randint(1, 6) # Expanded from 4 to 6 to cover Member 5's suggestions!
     event, severity, status = random.choice(EVENT_TYPES)
 
     if noise_type == 1:
         return random.choice(NOISE_STRINGS)
-
     elif noise_type == 2:
-        return (
-            f"{generate_timestamp()},"
-            f"{generate_invalid_ip()},"
-            f"{event},"
-            f"{severity},"
-            f"{status}"
-        )
-
+        return f"{generate_timestamp()},{generate_invalid_ip()},{event},{severity},{status}"
     elif noise_type == 3:
-        return (
-            f"{generate_timestamp()},"
-            f"{generate_valid_ip()},"
-            f"{event}"
-        )
-
+        return f"{generate_timestamp()},{generate_valid_ip()},{event}"
+    elif noise_type == 4:
+        return f"{generate_timestamp()},{generate_valid_ip()},{event},{severity},{status},EXTRA_FIELD"
+    elif noise_type == 5:
+        # GAP COVERAGE: Malformed Timestamp
+        return f"BAD_TIMESTAMP_2026,{generate_valid_ip()},{event},{severity},{status}"
     else:
-        return (
-            f"{generate_timestamp()},"
-            f"{generate_valid_ip()},"
-            f"{event},"
-            f"{severity},"
-            f"{status},"
-            f"EXTRA_FIELD"
-        )
+        # GAP COVERAGE: Malformed Event Type
+        return f"{generate_timestamp()},{generate_valid_ip()},UNKNOWN_HACK_ATTACK,{severity},{status}"
 
 
 # Dataset Creation
