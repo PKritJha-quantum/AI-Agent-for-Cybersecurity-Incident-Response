@@ -3,14 +3,14 @@ import json
 import os
 from datetime import datetime
 
-CONFIG_PATH = "src/security_config.json" if os.path.exsits("src/security_config.json") else "security_condig.json"
+CONFIG_PATH = "src/security_config.json" if os.path.exists("src/security_config.json") else "security_condig.json"
 BLACKLIST_PATH = "../data/firewall_blacklist.txt" if os.path.exists("../data") else "firewall_blacklist.txt"
 
 def load_security_settings():
   try:
     with open(CONFIG_PATH, "r") as file:
       config =  json.load(file)
-      settings = {items["parameters"] : item["values"] for item in config["security_settings"]}
+      settings = {item["parameters"] : item["values"] for item in config["security_settings"]}
       return settings 
   except FileNotFoundError:
       print(f"Warning: Configuration not found at {CONFIG_PATH}. Using local fallback thresholds.")
