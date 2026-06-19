@@ -1,6 +1,7 @@
 # src/threat_simulator.py
 
 import random
+import os
 from datetime import datetime, timedelta
 
 # Configuration
@@ -141,7 +142,7 @@ def generate_logs(total_logs):
 # Save File
 
 
-def save_logs(filename="raw_logs.txt"):
+def save_logs(filename="../data/raw_logs.txt"):
 
     logs, valid_count, invalid_count = generate_logs(TOTAL_LOGS)
 
