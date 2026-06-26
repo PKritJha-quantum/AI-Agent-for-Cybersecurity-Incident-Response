@@ -6,7 +6,7 @@
   <title>CyberGuard AI — Security Response Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -15,200 +15,240 @@
   <header class="site-header">
     <div class="header-inner">
 
-      <!-- Brand + radar pulse signature element -->
       <div class="brand">
-        <div class="radar-pulse" aria-hidden="true">
-          <span class="pulse-ring pulse-ring--1"></span>
-          <span class="pulse-ring pulse-ring--2"></span>
-          <span class="pulse-ring pulse-ring--3"></span>
-          <svg class="radar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
-            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+        <!-- Radar pulse — signature mark -->
+        <div class="radar-wrap" aria-hidden="true">
+          <span class="pulse-ring r1"></span>
+          <span class="pulse-ring r2"></span>
+          <svg class="radar-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9"   stroke="currentColor" stroke-width="1.6"/>
+            <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.6"/>
             <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-            <line x1="12" y1="12" x2="19" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="12" y1="12" x2="18.4" y2="5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </div>
         <div class="brand-text">
           <h1 class="brand-name">CyberGuard <span class="brand-ai">AI</span></h1>
-          <p class="brand-subtitle">Security Response Intelligence Platform</p>
+          <p class="brand-sub">Security Response Intelligence</p>
         </div>
       </div>
 
-      <!-- Connection status + meta -->
-      <div class="header-meta">
-        <div class="status-badge" id="statusBadge" role="status" aria-live="polite">
+      <div class="header-right">
+        <div class="status-pill" id="statusBadge" role="status" aria-live="polite">
           <span class="status-dot" id="statusDot"></span>
           <span class="status-label" id="statusLabel">Connecting…</span>
         </div>
         <div class="header-divider" aria-hidden="true"></div>
-        <div class="session-info">
-          <span class="session-label">Session</span>
-          <span class="session-id" id="sessionId">—</span>
+        <div class="session-chip">
+          <span class="session-eyebrow">Session</span>
+          <span class="session-val" id="sessionId">—</span>
         </div>
+        <button class="nav-icon-btn" id="historyBtn" aria-label="Load history" title="Load history">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 6.5v4l2.5 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="nav-icon-btn nav-icon-btn--danger" id="clearBtn" aria-label="Clear chat">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
       </div>
 
     </div>
-
-    <!-- Thin animated scan line -->
-    <div class="scan-line" aria-hidden="true"></div>
   </header>
 
   <!-- ===================== MAIN ===================== -->
-  <main class="main-layout">
+  <main class="main-wrap">
 
-    <!-- ---- Sidebar ---- -->
-    <aside class="sidebar">
-      <div class="sidebar-section">
-        <p class="sidebar-heading">Threat Level</p>
-        <div class="threat-meter">
-          <div class="threat-bar" id="threatBar">
-            <div class="threat-fill" id="threatFill" style="width: 0%"></div>
+    <!-- ---- BENTO GRID (top stats + quick actions) ---- -->
+    <section class="bento-grid" aria-label="Dashboard overview">
+
+      <!-- Card: Threat Level (tall left) -->
+      <div class="bento-card bento-card--threat" id="threatCard">
+        <div class="bento-label">Threat Level</div>
+        <div class="threat-display">
+          <div class="threat-ring-wrap" aria-hidden="true">
+            <svg class="threat-ring-svg" viewBox="0 0 80 80">
+              <circle class="ring-track" cx="40" cy="40" r="34" />
+              <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="34"
+                stroke-dasharray="213.6" stroke-dashoffset="213.6" />
+            </svg>
+            <span class="threat-ring-label" id="threatPct">—</span>
           </div>
-          <span class="threat-label" id="threatLabel">—</span>
+          <div class="threat-meta">
+            <span class="threat-level-text" id="threatLevelText">No data</span>
+            <span class="threat-level-sub">Current risk</span>
+          </div>
         </div>
       </div>
 
-      <div class="sidebar-section">
-        <p class="sidebar-heading">Quick Actions</p>
-        <nav class="quick-actions" aria-label="Quick action shortcuts">
-          <button class="quick-btn" data-prompt="Analyze this network intrusion log for anomalies and potential attack vectors.">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 2L2 6v8l8 4 8-4V6L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" fill="currentColor"/></svg>
-            Intrusion Analysis
+      <!-- Card: Stats (queries, avg time, uptime) -->
+      <div class="bento-card bento-card--stats">
+        <div class="bento-label">Session Stats</div>
+        <div class="stat-grid">
+          <div class="stat-cell">
+            <span class="stat-number" id="statQueries">0</span>
+            <span class="stat-caption">Queries</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-number" id="statAvgTime">—</span>
+            <span class="stat-caption">Avg. response</span>
+          </div>
+          <div class="stat-cell stat-cell--wide">
+            <span class="stat-number stat-number--mono" id="statUptime">00:00:00</span>
+            <span class="stat-caption">Session uptime</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Quick Actions -->
+      <div class="bento-card bento-card--actions">
+        <div class="bento-label">Quick Analysis</div>
+        <nav class="quick-grid" aria-label="Quick action shortcuts">
+          <button class="quick-tile" data-prompt="Analyze this network intrusion log for anomalies and potential attack vectors.">
+            <span class="quick-icon quick-icon--indigo" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="none"><path d="M9 1.5L2 5.25v7.5L9 16.5l7-3.75v-7.5L9 1.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="9" cy="9" r="2" fill="currentColor"/></svg>
+            </span>
+            <span class="quick-tile-label">Intrusion<br>Analysis</span>
           </button>
-          <button class="quick-btn" data-prompt="Perform a threat intelligence summary for the following IOCs and suggest remediation steps.">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            Threat Intel
+          <button class="quick-tile" data-prompt="Perform a threat intelligence summary for the following IOCs and suggest remediation steps.">
+            <span class="quick-icon quick-icon--amber" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M9 5.5v4l2.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </span>
+            <span class="quick-tile-label">Threat<br>Intel</span>
           </button>
-          <button class="quick-btn" data-prompt="Generate an incident response playbook for a ransomware attack scenario.">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 4h12v12H4V4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 10h4M10 8v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            IR Playbook
+          <button class="quick-tile" data-prompt="Generate an incident response playbook for a ransomware attack scenario.">
+            <span class="quick-icon quick-icon--rose" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="none"><rect x="3" y="3" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 9h4M9 7v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </span>
+            <span class="quick-tile-label">IR<br>Playbook</span>
           </button>
-          <button class="quick-btn" data-prompt="Review the following CVE details and assess the risk impact for a web application environment.">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 3l1.5 4.5H16l-3.7 2.7 1.4 4.3L10 12l-3.7 2.5 1.4-4.3L4 7.5h4.5L10 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            CVE Analysis
+          <button class="quick-tile" data-prompt="Review the following CVE details and assess the risk impact for a web application environment.">
+            <span class="quick-icon quick-icon--teal" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="none"><path d="M9 2l1.8 5H16l-4.2 3.1 1.6 5L9 12.2l-4.4 2.9 1.6-5L2 7h5.2L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="quick-tile-label">CVE<br>Analysis</span>
           </button>
-          <button class="quick-btn" data-prompt="Analyze these logs for signs of data exfiltration and lateral movement.">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 10h14M3 6h14M3 14h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            Log Forensics
+          <button class="quick-tile" data-prompt="Analyze these logs for signs of data exfiltration and lateral movement.">
+            <span class="quick-icon quick-icon--slate" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="none"><path d="M2.5 9h13M2.5 5h13M2.5 13h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </span>
+            <span class="quick-tile-label">Log<br>Forensics</span>
           </button>
         </nav>
       </div>
 
-      <div class="sidebar-section">
-        <p class="sidebar-heading">Stats</p>
-        <ul class="stat-list" role="list">
-          <li class="stat-item">
-            <span class="stat-label">Queries</span>
-            <span class="stat-value" id="statQueries">0</span>
+      <!-- Card: Live pipeline status -->
+      <div class="bento-card bento-card--pipeline">
+        <div class="bento-label">Pipeline</div>
+        <ul class="pipeline-list" role="list">
+          <li class="pipeline-step pipeline-step--done">
+            <span class="pipe-dot"></span>
+            <span class="pipe-label">threat_simulator.py</span>
+            <span class="pipe-badge pipe-badge--ok">200 logs</span>
           </li>
-          <li class="stat-item">
-            <span class="stat-label">Avg Response</span>
-            <span class="stat-value" id="statAvgTime">—</span>
+          <li class="pipeline-step pipeline-step--done">
+            <span class="pipe-dot"></span>
+            <span class="pipe-label">log_parser.py</span>
+            <span class="pipe-badge pipe-badge--ok">160 valid</span>
           </li>
-          <li class="stat-item">
-            <span class="stat-label">Uptime</span>
-            <span class="stat-value" id="statUptime">—</span>
+          <li class="pipeline-step pipeline-step--done">
+            <span class="pipe-dot"></span>
+            <span class="pipe-label">cleaned_logs.csv</span>
+            <span class="pipe-badge pipe-badge--ok">80%</span>
+          </li>
+          <li class="pipeline-step pipeline-step--active">
+            <span class="pipe-dot pipe-dot--pulse"></span>
+            <span class="pipe-label">AI Analysis</span>
+            <span class="pipe-badge pipe-badge--live">Live</span>
           </li>
         </ul>
       </div>
-    </aside>
 
-    <!-- ---- Chat Panel ---- -->
-    <section class="chat-panel" aria-label="Security analysis chat">
+    </section>
 
-      <!-- Response feed -->
-      <div class="response-feed" id="responseFeed" role="log" aria-live="polite" aria-label="Analysis responses">
+    <!-- ---- CHAT PANEL ---- -->
+    <section class="chat-section" aria-label="Security analysis chat">
 
-        <!-- Welcome card (shown before first query) -->
-        <div class="welcome-card" id="welcomeCard">
-          <div class="welcome-icon" aria-hidden="true">
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
-              <circle cx="24" cy="24" r="12" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
-              <circle cx="24" cy="24" r="4" fill="currentColor"/>
-              <line x1="24" y1="24" x2="36" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Feed -->
+      <div class="chat-feed" id="responseFeed" role="log" aria-live="polite" aria-label="Analysis responses">
+
+        <!-- Welcome state -->
+        <div class="welcome-state" id="welcomeCard">
+          <div class="welcome-icon-wrap" aria-hidden="true">
+            <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="28" cy="28" r="24" stroke="currentColor" stroke-width="1.5" opacity="0.2"/>
+              <circle cx="28" cy="28" r="14" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+              <circle cx="28" cy="28" r="4.5" fill="currentColor"/>
+              <line x1="28" y1="28" x2="40" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <h2 class="welcome-title">Ready for Analysis</h2>
-          <p class="welcome-body">Submit a security query — paste logs, describe an incident, or ask for threat intelligence. I'll analyze and respond with actionable insights.</p>
-          <ul class="welcome-hints" role="list">
-            <li>Paste raw logs or IOCs for deep analysis</li>
-            <li>Describe an attack pattern or anomaly</li>
-            <li>Request a CVE risk assessment</li>
-            <li>Generate incident response playbooks</li>
-          </ul>
+          <h2 class="welcome-title">Ready for analysis</h2>
+          <p class="welcome-body">Submit a security query — paste logs, describe an incident, or request threat intelligence. I'll respond with actionable insights.</p>
+          <div class="welcome-chips">
+            <span class="welcome-chip">Paste raw logs or IOCs</span>
+            <span class="welcome-chip">Describe an anomaly</span>
+            <span class="welcome-chip">CVE risk assessment</span>
+            <span class="welcome-chip">Generate IR playbook</span>
+          </div>
         </div>
 
       </div>
 
-      <!-- Loading indicator -->
-      <div class="loading-bar" id="loadingBar" aria-hidden="true" style="display:none">
-        <div class="loading-inner">
-          <div class="spinner" aria-hidden="true">
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring spinner-ring--2"></div>
+      <!-- Loading bar -->
+      <div class="loading-strip" id="loadingBar" style="display:none" aria-hidden="true">
+        <div class="loading-strip-inner">
+          <div class="loading-spinner">
+            <div class="ls-ring"></div>
           </div>
-          <div class="loading-text">
-            <span class="loading-primary" id="loadingPrimary">Analyzing security events…</span>
-            <span class="loading-secondary" id="loadingSecondary">Cross-referencing threat database</span>
+          <div class="loading-copy">
+            <span class="lc-primary" id="loadingPrimary">Analyzing security events…</span>
+            <span class="lc-secondary" id="loadingSecondary">Cross-referencing threat database</span>
           </div>
         </div>
-        <div class="loading-progress" aria-hidden="true">
-          <div class="loading-progress-fill" id="loadingProgress"></div>
-        </div>
+        <div class="loading-shimmer-bar"><div class="loading-shimmer-fill"></div></div>
       </div>
 
-      <!-- Input area -->
-      <div class="input-area">
-        <div class="input-wrapper">
-          <label for="promptInput" class="sr-only">Security query input</label>
+      <!-- Input composer -->
+      <div class="composer">
+        <div class="composer-box" id="composerBox">
+          <label for="promptInput" class="sr-only">Security query</label>
           <textarea
             id="promptInput"
-            class="prompt-input"
+            class="composer-textarea"
             placeholder="Paste logs, describe an incident, or ask a security question…"
             rows="3"
             maxlength="4000"
             aria-describedby="charCount inputHint"
             spellcheck="true"
           ></textarea>
-          <div class="input-footer">
-            <span class="input-hint" id="inputHint">
+          <div class="composer-footer">
+            <span class="composer-hint" id="inputHint">
               <kbd>Enter</kbd> to send &nbsp;·&nbsp; <kbd>Shift+Enter</kbd> for new line
             </span>
-            <span class="char-count" id="charCount" role="status" aria-live="polite">0 / 4000</span>
+            <div class="composer-right">
+              <span class="char-count" id="charCount" role="status" aria-live="polite">0 / 4000</span>
+              <button class="btn-analyze" id="analyzeBtn" aria-label="Analyze security query">
+                <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 9l6 6 8-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Analyze
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div class="action-row">
-          <button class="btn btn--ghost" id="clearBtn" aria-label="Clear chat history">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            Clear
-          </button>
-          <button class="btn btn--ghost" id="historyBtn" aria-label="Load chat history">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 10a7 7 0 1014 0A7 7 0 003 10z" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            History
-          </button>
-          <button class="btn btn--primary" id="analyzeBtn" aria-label="Analyze security query">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 2L3 6v8l7 4 7-4V6L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 10l4-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            Analyze
-          </button>
         </div>
       </div>
 
     </section>
+
   </main>
 
-  <!-- ===================== TOAST NOTIFICATIONS ===================== -->
-  <div class="toast-container" id="toastContainer" aria-live="assertive" aria-atomic="true"></div>
+  <!-- ===================== TOAST ===================== -->
+  <div class="toast-stack" id="toastContainer" aria-live="assertive" aria-atomic="true"></div>
 
   <!-- ===================== FOOTER ===================== -->
   <footer class="site-footer">
     <div class="footer-inner">
       <span class="footer-brand">CyberGuard AI</span>
       <span class="footer-sep" aria-hidden="true">·</span>
-      <span class="footer-copy">Security intelligence, not a substitute for expert review</span>
+      <span>Not a substitute for expert security review</span>
       <span class="footer-sep" aria-hidden="true">·</span>
-      <span class="footer-version">v1.0.0</span>
+      <span>v1.0.0</span>
     </div>
   </footer>
 
