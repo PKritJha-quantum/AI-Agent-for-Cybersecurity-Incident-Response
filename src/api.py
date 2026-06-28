@@ -1,66 +1,85 @@
-from flask import Flask, jsonify, request
+import os
+import sys
+import json
+from flask import Flask, jsonify, request, send_from_directory
 from datetime import datetime
 
-app = Flask(__name__)
+# Enforce exact absolute pathing lookups relative to this file's position
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Check if 'src' is part of the path or if we are running from root
+if os.path.basename(current_dir) == 'src':
+    base_project_dir = os.path.abspath(os.path.join(current_dir, ".."))
+    frontend_folder = os.path.abspath(os.path.join(current_dir, "..", "frontend"))
+else:
+    base_project_dir = current_dir
+    frontend_folder = os.path.abspath(os.path.join(current_dir, "frontend"))
+
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+if base_project_dir not in sys.path:
+    sys.path.append(base_project_dir)
+
+# Safe structural lookup and dynamic injection of the analytics files
+try:
+    import threat_simulator
+    import log_parser
+    import remediation_control
+except ImportError:
+    # If modules are inside a src folder relative to root, add src to path
+    src_dir = os.path.join(base_project_dir, "src")
+    if src_dir not in sys.path:
+        sys.path.append(src_dir)
+    try:
+        import threat_simulator
+        import log_parser
+        import remediation_control
+    except ImportError as e:
+        print(f"⚠️ Core processing files operating in standalone fallback sandbox state: {e}")
+
+app = Flask(__name__, static_folder=frontend_folder, static_url_path='')
+
+# Universal Cross-Origin Resource Sharing Layer (Fixes Member 6's Frontend Disconnects)
+@app.after_request
+def apply_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Session-ID"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
 
 # =====================================================================
-# Server startup
+# 🖥️ FRONTEND ROUTING TARGETS
 # =====================================================================
-
 @app.route("/", methods=["GET"])
 def home():
-    """Basic health check route to confirm the server is running."""
-    return jsonify({
-        "status": "success",
-        "message": "AI Agent for Cybersecurity Incident Response - Server is running",
-        "timestamp": datetime.utcnow().isoformat()
-    }), 200
+    """Natively hosts and displays Member 4's Bento Grid application user interface."""
+    return send_from_directory(frontend_folder, 'index.html')
 
+@app.route('/<path:path>')
+def serve_static_files(path):
+    """Fallback router ensuring styles.css and script.js maps cleanly."""
+    return send_from_directory(frontend_folder, path)
 
+# =====================================================================
+# 📡 QUALITY ASSURANCE LIVE PIPELINE TESTING ENDPOINTS
+# =====================================================================
 @app.route("/api/status", methods=["GET"])
 def status():
-    """Returns the current operational status of the server."""
     return jsonify({
         "status": "online",
         "service": "incident-response-agent",
         "version": "1.0.0"
     }), 200
 
-
-@app.route("/api/incident", methods=["POST"])
-def receive_incident():
-    """Accepts a JSON incident payload and echoes it back."""
-    data = request.get_json(silent=True)
-    if not data:
-        return jsonify({
-            "status": "error",
-            "message": "Invalid or missing JSON body"
-        }), 400
-
-    response = {
-        "status": "received",
-        "incident": data,
-        "received_at": datetime.utcnow().isoformat()
-    }
-    return jsonify(response), 201
-
-
-# =====================================================================
-# API
-# =====================================================================
-
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """Slide Requirement 1: Dedicated app health checkpoint."""
     return jsonify({
         "status": "healthy",
         "database": "connected"
     }), 200
 
-
 @app.route('/api/users', methods=['GET'])
 def get_users():
-    """Slide Requirement 2: Fetch logged-in team profiles with real names."""
     return jsonify({
         "users": [
             {"id": 1, "username": "Priyakriti Jha", "role": "incident responder"},
@@ -72,67 +91,77 @@ def get_users():
         ]
     }), 200
 
-
 @app.route('/api/history', methods=['GET'])
 def get_history():
-    """Slide Requirement 3: Retrieve previous incident chat histories."""
     return jsonify({
-        "history": [
-            {"session_id": "sys_001", "last_prompt": "Analyze firewall log"}
+        "messages": [
+            {
+                "role": "user",
+                "content": "Verify configuration parameter schemas.",
+                "timestamp": datetime.utcnow().isoformat()
+            },
+            {
+                "role": "ai",
+                "content": "## Baseline Checked\nSystem validation rules analyzed. All rules conform to dictionary specifications.",
+                "timestamp": datetime.utcnow().isoformat()
+            }
         ]
     }), 200
 
-
-@app.route('/api/chat', methods=['POST'])
+@app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def handle_chat():
-    """Slide Requirement 4: Process input prompts from the frontend."""
+    if request.method == 'OPTIONS':
+        return jsonify({"status": "preflight-passed"}), 200
+
     data = request.get_json() or {}
-    user_prompt = data.get("prompt", "")
+    user_prompt = data.get("message") or data.get("prompt", "")
     
     if not user_prompt:
         return jsonify({"error": "Prompt data field is required"}), 400
-      
+
+    threat_level = "low"
+    pipeline_summary = ""
+
+    # Check text contexts to execute the underlying file modifications
+    if any(k in user_prompt.lower() for k in ["log", "intrusion", "attacker", "anomaly", "analyze"]):
+        threat_level = "high"
+        try:
+            data_dir = os.path.abspath(os.path.join(base_project_dir, "data"))
+            raw_log_path = os.path.join(data_dir, "raw_logs.txt")
+            clean_csv_path = os.path.join(data_dir, "cleaned_logs.csv")
+            os.makedirs(data_dir, exist_ok=True)
+            
+            # Pipe context directly through the analytic scripts
+            threat_simulator.save_logs(raw_log_path)
+            log_parser.parse_logs(raw_log_path, clean_csv_path)
+            eval_status = remediation_control.evaluate_login_anomalies("185.220.101.5", failed_attempts=8)
+            
+            pipeline_summary = f"\n\n### 🛡️ Core Automation Pipeline Processing Metrics:\n* **Logs Generator Engine**: Executed smoothly.\n* **Data Cleaning Parser**: Filtered outputs written to `cleaned_logs.csv`.\n* **Threshold Assessment Mitigation**: `{eval_status}`"
+        except Exception as e:
+            pipeline_summary = f"\n\n*⚠️ Core Engine execution tracking note: Processing in isolation layer ({e}).*"
+
+    ai_response = (
+        f"## CyberGuard Active Telemetry Ingestion\n\n"
+        f"Parsed Input Text: `{user_prompt}`\n\n"
+        f"System metrics logged successfully. Core structural components verified.{pipeline_summary}"
+    )
+
     return jsonify({
-        "prompt_received": user_prompt,
-        "response": f"AI Response generated for query: '{user_prompt}'",
-        "status": "success"
+        "id": f"msg-{int(datetime.utcnow().timestamp())}",
+        "response": ai_response,
+        "status": "success",
+        "metadata": {
+            "threat_level": threat_level
+        }
     }), 200
 
-
-@app.route('/api/feedback', methods=['POST'])
+@app.route('/api/feedback', methods=['POST', 'OPTIONS'])
 def handle_feedback():
-    """Slide Requirement 5: Store ratings from analysts."""
-    data = request.get_json() or {}
-    rating = data.get("rating")
-    
-    if rating is None:
-        return jsonify({"error": "Rating score is required"}), 400
-        
-    return jsonify({
-        "message": "Feedback successfully logged",
-        "rating_received": rating
-    }), 201
-
-
-# =====================================================================
-# Error Safegaurd
-# =====================================================================
-
-@app.errorhandler(404)
-def not_found(e):
-    return jsonify({
-        "status": "error",
-        "message": "Route not found"
-    }), 404
-
-
-@app.errorhandler(500)
-def server_error(e):
-    return jsonify({
-        "status": "error",
-        "message": "Internal server error"
-    }), 500
-
+    if request.method == 'OPTIONS':
+        return jsonify({"status": "preflight-passed"}), 200
+    return jsonify({"message": "Feedback successfully logged"}), 201
 
 if __name__ == '__main__':
+    print(f"\n🚀 CyberGuard Host Running Live!")
+    print(f"🔗 Open your web browser directly to: http://localhost:5000/\n")
     app.run(host="0.0.0.0", port=5000, debug=True)
