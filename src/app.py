@@ -5,7 +5,12 @@
 from flask import Flask, jsonify, request
 from datetime import datetime
 
+# --- Member 3's chat history integration ---
+from history.history_routes import history_bp
+
 app = Flask(__name__)
+app.register_blueprint(history_bp)  # adds GET/DELETE /api/history
+
 
 # -----------------------------
 # Health Check / Root Route
@@ -44,7 +49,6 @@ def receive_incident():
       - security_config.json (trusted IPs / thresholds)
       - incident_classifier.py (classification logic)
       - response_engine.py (automated response)
-
     Example request body:
     {
         "id": "INC-001",
@@ -53,7 +57,6 @@ def receive_incident():
     }
     """
     data = request.get_json(silent=True)
-
     if not data:
         return jsonify({
             "status": "error",
@@ -65,8 +68,24 @@ def receive_incident():
         "incident": data,
         "received_at": datetime.utcnow().isoformat()
     }
-
     return jsonify(response), 201
+
+
+# -----------------------------
+# NOTE FOR MEMBER 2:
+# When you build the /api/chat route, add this import at the top:
+#     from history.chat_history import save_exchange
+# Then call save_exchange(message, ai_reply) right before your
+# return statement, like this:
+#
+# @app.route("/api/chat", methods=["POST"])
+# def chat():
+#     data = request.get_json(silent=True)
+#     message = data.get("message", "")
+#     ai_reply = get_ai_response(message)      # your AI logic
+#     save_exchange(message, ai_reply)         # <-- saves to history
+#     return jsonify({"reply": ai_reply}), 200
+# -----------------------------
 
 
 # -----------------------------
